@@ -15,6 +15,7 @@
       --shiny-gold: #f1e05a;
       --border: #30363d;
       --purple-raid: #8e44ad;
+      --blue-action: #1f6feb;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -41,6 +42,8 @@
 
     .btn-action { padding: 6px 12px; font-size: 0.85em; background: var(--accent); border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 3px; transition: background 0.2s; }
     .btn-action:hover { background: var(--accent-hover); }
+    .btn-blue { background: var(--blue-action); }
+    .btn-blue:hover { background: #388bfd; }
 
     /* Arena & Combat */
     .battle-arena { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); min-height: 200px; border-radius: 8px; padding: 15px; margin-bottom: 12px; border: 1px solid var(--border); }
@@ -51,8 +54,9 @@
     .shield-fill { height: 100%; background: #00d2d3; width: 100%; transition: width 0.3s; }
 
     .log-box { height: 130px; background: rgba(0,0,0,0.6); border-radius: 6px; padding: 8px; overflow-y: auto; font-family: monospace; font-size: 0.8em; border: 1px solid var(--border); }
-    
-    /* Modal / Configuration */
+    .combat-controls { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
+
+    /* Modal */
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index:100; justify-content: center; align-items: center; }
     .modal-content { background: var(--panel-bg); border: 1px solid var(--border); padding: 20px; border-radius: 10px; max-width: 500px; width: 90%; max-height: 85vh; overflow-y: auto; }
   </style>
@@ -72,7 +76,7 @@
   <nav>
     <button class="nav-btn active" onclick="switchTab('gacha')">🥚 Couvoir</button>
     <button class="nav-btn" onclick="switchTab('teams')">👥 Équipes</button>
-    <button class="nav-btn" onclick="switchTab('box')">📦 Boîte & Optimisation</button>
+    <button class="nav-btn" onclick="switchTab('box')">📦 Boîte & Talents</button>
     <button class="nav-btn" onclick="switchTab('pve')">⚔️ Combats & Raids</button>
     <button class="nav-btn" onclick="switchTab('shop')">🛒 Boutique</button>
   </nav>
@@ -80,7 +84,7 @@
   <!-- TAB: GACHA -->
   <div id="tab-gacha" class="tab-content active">
     <h2>Couvoir & Éclosions</h2>
-    <p style="margin-bottom: 15px; opacity: 0.8; font-size:0.9em;">Faites éclore des œufs pour obtenir des Pokémon avec des IVs aléatoires et des variantes Shiny !</p>
+    <p style="margin-bottom: 15px; opacity: 0.8; font-size:0.9em;">Faites éclore des œufs pour obtenir des Pokémon dotés de Talents et d'IVs uniques !</p>
     <div style="text-align: center; padding: 25px; border: 1px dashed var(--border); border-radius: 8px;">
       <div style="font-size: 3em; margin-bottom: 10px;">🥚</div>
       <button class="btn-action" onclick="hatchEgg()">Faire éclore 1 Œuf</button>
@@ -90,7 +94,7 @@
 
   <!-- TAB: TEAMS -->
   <div id="tab-teams" class="tab-content">
-    <h2>Gestion des Équipes (6 Pokémon max par équipe)</h2>
+    <h2>Gestion des Équipes (6 Pokémon max)</h2>
     <div style="margin-bottom: 15px;">
       <label>Sélectionner l'équipe : </label>
       <select id="active-team-select" onchange="setActiveTeam(this.value)" style="padding:6px; background:var(--card-bg); color:var(--text); border:1px solid var(--border); border-radius:4px;">
@@ -107,7 +111,7 @@
 
   <!-- TAB: BOX -->
   <div id="tab-box" class="tab-content">
-    <h2>Boîte Pokémon & Optimisation (Cliquez sur un Pokémon pour le configurer)</h2>
+    <h2>Boîte Pokémon (Talents, IVs & Spells)</h2>
     <div id="box-grid" class="grid-container"></div>
   </div>
 
@@ -116,7 +120,7 @@
     <h2>Zone de Combat & Raids Dimensionnels</h2>
     <div class="battle-arena">
       <div class="fighter">
-        <div id="player-team-name">Équipe Active (0 Pokémon)</div>
+        <div id="player-active-name">Aucun Pokémon actif</div>
         <img id="player-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" />
         <div class="health-bar"><div id="player-hp" class="health-fill"></div></div>
       </div>
@@ -134,10 +138,16 @@
     <div style="text-align: center; margin-bottom: 10px;">
       <button class="btn-action" onclick="startBattle('wild')">🌿 Combat PvE</button>
       <button class="btn-action" style="background:var(--purple-raid);" onclick="startBattle('raid')">👹 Raid Dynamax</button>
-      <button id="btn-attack" class="btn-action" style="display:none; background:#2ea043;" onclick="executeTeamTurn()">⚔️ Attaquer avec l'Équipe</button>
     </div>
 
-    <div id="battle-log" class="log-box" style="margin-top:10px;">Prêt au combat. Sélectionnez une zone de combat ci-dessus.</div>
+    <!-- Contrôles de Combat Interactifs (Attaques & Swap) -->
+    <div id="combat-actions" style="display:none; margin-bottom: 10px;">
+      <p style="font-size:0.85em; margin-bottom:5px; color:#58a6ff;">Choisissez une action :</p>
+      <div id="moves-grid" class="combat-controls"></div>
+      <button class="btn-action btn-blue" style="width:100%; margin-top:8px;" onclick="openSwapModal()">🔄 Changer de Pokémon (Swap)</button>
+    </div>
+
+    <div id="battle-log" class="log-box" style="margin-top:10px;">Prêt au combat. Lancez un combat PvE ou Raid ci-dessus.</div>
   </div>
 
   <!-- TAB: SHOP -->
@@ -164,26 +174,83 @@
     </div>
   </div>
 
-  <!-- MODAL DETAILS POKEMON -->
-  <div id="poke-modal" class="modal" onclick="closeModal()">
+  <!-- MODAL CONFIGURATION POKÉMON -->
+  <div id="poke-modal" class="modal" onclick="closeModal('poke-modal')">
     <div class="modal-content" onclick="event.stopPropagation()">
       <h3 id="modal-title">Détails du Pokémon</h3>
       <div id="modal-body" style="margin-top: 15px; font-size: 0.9em;"></div>
-      <button class="btn-action" style="margin-top: 15px; width:100%;" onclick="closeModal()">Fermer</button>
+      <button class="btn-action" style="margin-top: 15px; width:100%;" onclick="closeModal('poke-modal')">Fermer</button>
+    </div>
+  </div>
+
+  <!-- MODAL SWAP PENDANT COMBAT -->
+  <div id="swap-modal" class="modal" onclick="closeModal('swap-modal')">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <h3>Choisir un Pokémon de l'équipe</h3>
+      <div id="swap-list" class="grid-container" style="margin-top:15px;"></div>
+      <button class="btn-action" style="margin-top: 15px; width:100%; background:#555;" onclick="closeModal('swap-modal')">Annuler</button>
     </div>
   </div>
 
   <script>
+    // Base de données avec Learnset par niveau et Talents (Abilities)
     const POKEMON_DB = [
-      { id: 1, name: "Bulbizarre", evoId: 2, evoLevel: 16, type1: "Plante", baseStats: { hp: 45, atk: 49, def: 49, spe: 45 }, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1.png", moves: [{ name: "Fouet Lianes", power: 45 }, { name: "Charge", power: 40 }] },
-      { id: 2, name: "Herbizarre", evoId: 3, evoLevel: 32, type1: "Plante", baseStats: { hp: 60, atk: 62, def: 63, spe: 60 }, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png", shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/2.png", moves: [{ name: "Tranch'Herbe", power: 55 }, { name: "Fouet Lianes", power: 45 }] },
-      { id: 3, name: "Florizarre", evoId: null, evoLevel: 99, type1: "Plante", baseStats: { hp: 80, atk: 82, def: 83, spe: 80 }, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png", shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/3.png", moves: [{ name: "Lance-Soleil", power: 120 }, { name: "Tranch'Herbe", power: 55 }] },
-      
-      { id: 4, name: "Salamèche", evoId: 5, evoLevel: 16, type1: "Feu", baseStats: { hp: 39, atk: 52, def: 43, spe: 65 }, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png", shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/4.png", moves: [{ name: "Flammèche", power: 40 }, { name: "Griffe", power: 40 }] },
-      { id: 5, name: "Reptincel", evoId: 6, evoLevel: 36, type1: "Feu", baseStats: { hp: 58, atk: 64, def: 58, spe: 80 }, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png", shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/5.png", moves: [{ name: "Flammèche", power: 40 }, { name: "Dracogriffe", power: 80 }] },
-      { id: 6, name: "Dracaufeu", evoId: null, evoLevel: 99, type1: "Feu", baseStats: { hp: 78, atk: 84, def: 78, spe: 100 }, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png", shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/6.png", moves: [{ name: "Déflagration", power: 110 }, { name: "Dracogriffe", power: 80 }] },
-
-      { id: 150, name: "Mewtwo", evoId: null, evoLevel: 99, type1: "Psy", baseStats: { hp: 106, atk: 110, def: 90, spe: 130 }, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png", shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/150.png", moves: [{ name: "Psyko", power: 90 }, { name: "Aurasphère", power: 80 }] }
+      { 
+        id: 1, name: "Bulbizarre", evoId: 2, evoLevel: 16, type1: "Plante", ability: "Engrais",
+        baseStats: { hp: 45, atk: 49, def: 49, spe: 45 },
+        sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+        shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1.png",
+        learnset: { 1: { name: "Charge", power: 40 }, 5: { name: "Fouet Lianes", power: 45 }, 12: { name: "Tranch'Herbe", power: 55 }, 22: { name: "Lance-Soleil", power: 120 } }
+      },
+      { 
+        id: 2, name: "Herbizarre", evoId: 3, evoLevel: 32, type1: "Plante", ability: "Engrais",
+        baseStats: { hp: 60, atk: 62, def: 63, spe: 60 },
+        sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png",
+        shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/2.png",
+        learnset: { 1: { name: "Charge", power: 40 }, 5: { name: "Fouet Lianes", power: 45 }, 16: { name: "Tranch'Herbe", power: 55 }, 30: { name: "Lance-Soleil", power: 120 } }
+      },
+      { 
+        id: 3, name: "Florizarre", evoId: null, evoLevel: 99, type1: "Plante", ability: "Engrais",
+        baseStats: { hp: 80, atk: 82, def: 83, spe: 80 },
+        sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png",
+        shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/3.png",
+        learnset: { 1: { name: "Fouet Lianes", power: 45 }, 16: { name: "Tranch'Herbe", power: 55 }, 32: { name: "Lance-Soleil", power: 120 }, 45: { name: "Solar-Beam+", power: 140 } }
+      },
+      { 
+        id: 4, name: "Salamèche", evoId: 5, evoLevel: 16, type1: "Feu", ability: "Brasier",
+        baseStats: { hp: 39, atk: 52, def: 43, spe: 65 },
+        sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png",
+        shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/4.png",
+        learnset: { 1: { name: "Griffe", power: 40 }, 6: { name: "Flammèche", power: 40 }, 15: { name: "Dracogriffe", power: 80 }, 25: { name: "Déflagration", power: 110 } }
+      },
+      { 
+        id: 5, name: "Reptincel", evoId: 6, evoLevel: 36, type1: "Feu", ability: "Brasier",
+        baseStats: { hp: 58, atk: 64, def: 58, spe: 80 },
+        sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png",
+        shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/5.png",
+        learnset: { 1: { name: "Griffe", power: 40 }, 6: { name: "Flammèche", power: 40 }, 16: { name: "Dracogriffe", power: 80 }, 36: { name: "Déflagration", power: 110 } }
+      },
+      { 
+        id: 6, name: "Dracaufeu", evoId: null, evoLevel: 99, type1: "Feu", ability: "Brasier",
+        baseStats: { hp: 78, atk: 84, def: 78, spe: 100 },
+        sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png",
+        shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/6.png",
+        learnset: { 1: { name: "Flammèche", power: 40 }, 16: { name: "Dracogriffe", power: 80 }, 36: { name: "Déflagration", power: 110 }, 50: { name: "Blast Burn", power: 150 } }
+      },
+      { 
+        id: 150, name: "Mewtwo", evoId: null, evoLevel: 99, type1: "Psy", ability: "Pression",
+        baseStats: { hp: 106, atk: 110, def: 90, spe: 130 },
+        sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png",
+        shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/150.png",
+        learnset: { 1: { name: " Choc Mental", power: 50 }, 10: { name: "Aurasphère", power: 80 }, 30: { name: "Psyko", power: 90 }, 50: { name: "Frappe Psyschique", power: 100 } }
+      },
+      { 
+        id: 384, name: "Rayquaza", evoId: null, evoLevel: 99, type1: "Dragon", ability: "Air Lock",
+        baseStats: { hp: 105, atk: 150, def: 90, spe: 95 },
+        sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/384.png",
+        shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/384.png",
+        learnset: { 1: { name: "Dracogriffe", power: 80 }, 15: { name: "Vol", power: 90 }, 40: { name: "Colère", power: 120 }, 60: { name: "Dracoflécho", power: 140 } }
+      }
     ];
 
     let state = {
@@ -227,7 +294,6 @@
         exp: 0,
         isShiny,
         ivs,
-        activeMove: t.moves[0].name,
         uid: 'p_' + Date.now() + '_' + Math.floor(Math.random() * 10000)
       };
 
@@ -237,7 +303,7 @@
           ${isShiny ? '<div class="badge-shiny">SHINY</div>' : ''}
           <img src="${isShiny ? getTemplate(t.id).shinySprite : getTemplate(t.id).sprite}" />
           <h3>${getTemplate(t.id).name}</h3>
-          <p style="font-size:0.8em; color:#58a6ff;">ATK IV: ${ivs.atk}/31 | SPE IV: ${ivs.spe}/31</p>
+          <p style="font-size:0.8em; color:#58a6ff;">Talent : ${t.ability}</p>
         </div>
       `;
       updateUI();
@@ -246,11 +312,23 @@
     function randIV() { return Math.floor(Math.random() * 32); }
     function getTemplate(id) { return POKEMON_DB.find(p => p.id === id); }
 
+    // Récupérer toutes les attaques débloquées par niveau
+    function getAvailableMoves(pokemon) {
+      let t = getTemplate(pokemon.templateId);
+      let moves = [];
+      for (let lvl in t.learnset) {
+        if (pokemon.level >= parseInt(lvl)) {
+          moves.push(t.learnset[lvl]);
+        }
+      }
+      return moves;
+    }
+
     function renderBox() {
       const grid = document.getElementById('box-grid');
       grid.innerHTML = '';
       if (state.collection.length === 0) {
-        grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; opacity:0.6;">Votre boîte est vide. Faites éclore des œufs dans le couvoir !</p>';
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; opacity:0.6;">Votre boîte est vide. Faites éclore des œufs !</p>';
         return;
       }
       state.collection.forEach(p => {
@@ -262,11 +340,9 @@
           ${p.isShiny ? '<div class="badge-shiny">SHINY</div>' : ''}
           <img src="${p.isShiny ? t.shinySprite : t.sprite}" />
           <h4>${t.name}</h4>
-          <p style="font-size:0.75em; opacity:0.8;">Niv. ${p.level} | EXP: ${p.exp}/100</p>
+          <p style="font-size:0.75em; opacity:0.8;">Niv. ${p.level} | Talent: ${t.ability}</p>
           <div style="font-size:0.7em; margin-top:4px; text-align:left; background:rgba(0,0,0,0.3); padding:4px; border-radius:4px;">
-            <div>PV IV: ${p.ivs.hp}/31</div>
-            <div>ATK IV: ${p.ivs.atk}/31</div>
-            <div>Attaque : ${p.activeMove}</div>
+            <div>PV IV: ${p.ivs.hp}/31 | ATK IV: ${p.ivs.atk}/31</div>
           </div>
         `;
         grid.appendChild(card);
@@ -287,7 +363,7 @@
       let currentTeam = state.teams[state.activeTeamIdx];
 
       if (currentTeam.length === 0) {
-        activeGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; opacity:0.6;">Aucun Pokémon dans cette équipe. Ajoutez-en depuis votre boîte ci-dessous.</p>';
+        activeGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; opacity:0.6;">Aucun Pokémon dans cette équipe.</p>';
       } else {
         currentTeam.forEach(uid => {
           let p = state.collection.find(item => item.uid === uid);
@@ -298,16 +374,11 @@
           card.innerHTML = `
             <img src="${p.isShiny ? t.shinySprite : t.sprite}" />
             <h4>${t.name}</h4>
-            <p style="font-size:0.75em;">Niv. ${p.level}</p>
+            <p style="font-size:0.75em;">Niv. ${p.level} | ${t.ability}</p>
             <button class="btn-action" style="font-size:0.7em;" onclick="removeFromTeam('${uid}')">Retirer</button>
           `;
           activeGrid.appendChild(card);
         });
-      }
-
-      if (state.collection.length === 0) {
-        boxGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; opacity:0.6;">Boîte vide.</p>';
-        return;
       }
 
       state.collection.forEach(p => {
@@ -344,9 +415,12 @@
       let modal = document.getElementById('poke-modal');
       document.getElementById('modal-title').innerText = `${t.name} (Niv. ${p.level})`;
 
+      let unlockedMoves = getAvailableMoves(p);
+
       let body = document.getElementById('modal-body');
       body.innerHTML = `
         <p><strong>Type :</strong> ${t.type1}</p>
+        <p><strong>Talent :</strong> ${t.ability}</p>
         <p style="margin-top:8px;"><strong>Améliorer IV (Capsules dispo: ${state.capsules}) :</strong></p>
         <button class="btn-action" onclick="maxIV('${p.uid}', 'atk')">Max ATK IV (${p.ivs.atk}/31)</button>
         <button class="btn-action" onclick="maxIV('${p.uid}', 'hp')">Max PV IV (${p.ivs.hp}/31)</button>
@@ -354,21 +428,22 @@
         <p style="margin-top:8px;"><strong>Donner Bonbon EXP (Dispo: ${state.candies}) :</strong></p>
         <button class="btn-action" style="background:#8e44ad;" onclick="feedCandy('${p.uid}')">+1 Niveau</button>
 
-        <p style="margin-top:10px;"><strong>Attaque active :</strong> ${p.activeMove}</p>
-        <div>${t.moves.map(m => `<button class="btn-action" onclick="setMove('${p.uid}', '${m.name}')">${m.name} (Pwr:${m.power})</button>`).join(' ')}</div>
+        <p style="margin-top:10px;"><strong>Attaques débloquées :</strong></p>
+        <div style="display:flex; flex-wrap:wrap; gap:4px;">
+          ${unlockedMoves.map(m => `<span style="background:#333; padding:4px 8px; border-radius:4px; font-size:0.8em;">${m.name} (Pwr:${m.power})</span>`).join('')}
+        </div>
       `;
       modal.style.display = 'flex';
     }
 
-    function closeModal() {
-      document.getElementById('poke-modal').style.display = 'none';
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
       updateUI();
     }
 
     function maxIV(uid, stat) {
       if (state.capsules <= 0) { alert("Plus de Capsules d'Argent !"); return; }
       let p = state.collection.find(item => item.uid === uid);
-      if (!p) return;
       p.ivs[stat] = 31;
       state.capsules--;
       openPokemonModal(uid);
@@ -378,7 +453,6 @@
     function feedCandy(uid) {
       if (state.candies <= 0) { alert("Plus de bonbons EXP !"); return; }
       let p = state.collection.find(item => item.uid === uid);
-      if (!p) return;
       state.candies--;
       p.level++;
       
@@ -392,13 +466,6 @@
       updateUI();
     }
 
-    function setMove(uid, moveName) {
-      let p = state.collection.find(item => item.uid === uid);
-      if (!p) return;
-      p.activeMove = moveName;
-      openPokemonModal(uid);
-    }
-
     function buyItem(type, price) {
       if (state.coins < price) { alert("Pokédollars insuffisants !"); return; }
       state.coins -= price;
@@ -408,6 +475,7 @@
       updateUI();
     }
 
+    // SYSTÈME DE COMBAT INTERACTIF COMPLET
     let activeBattle = null;
 
     function startBattle(mode) {
@@ -415,39 +483,45 @@
       if (currentTeamUids.length === 0) { alert("Votre équipe active est vide ! Ajoutez des Pokémon dans l'onglet Équipes."); return; }
 
       let teamPokemons = currentTeamUids.map(uid => state.collection.find(p => p.uid === uid)).filter(Boolean);
-      if (teamPokemons.length === 0) { alert("Erreur d'équipe active."); return; }
-
+      
       let enemy = mode === 'raid'
-        ? { name: "Gigamax Rayquaza", hp: 800, maxHp: 800, shield: 300, maxShield: 300, sprite: POKEMON_DB[2].shinySprite, atk: 35, isRaid: true }
-        : { name: "Dresseur Sauvage", hp: 150, maxHp: 150, shield: 0, sprite: POKEMON_DB[3].sprite, atk: 15, isRaid: false };
+        ? { name: "Gigamax Rayquaza", hp: 800, maxHp: 800, shield: 300, maxShield: 300, sprite: POKEMON_DB.find(p=>p.id===384).shinySprite, atk: 35 }
+        : { name: "Dresseur Sauvage", hp: 150, maxHp: 150, shield: 0, sprite: POKEMON_DB.find(p=>p.id===4).sprite, atk: 15 };
 
       activeBattle = { team: teamPokemons, enemy, activeIndex: 0 };
 
-      let leadPoke = teamPokemons[0];
-      let leadT = getTemplate(leadPoke.templateId);
-
-      document.getElementById('player-team-name').innerText = `Équipe Active (${teamPokemons.length} Pokémon)`;
-      document.getElementById('player-img').src = leadPoke.isShiny ? leadT.shinySprite : leadT.sprite;
-      document.getElementById('enemy-name').innerText = enemy.name;
-      document.getElementById('enemy-img').src = enemy.sprite;
-      document.getElementById('shield-box').style.display = enemy.shield > 0 ? 'block' : 'none';
-
-      updateBattleHp();
-      document.getElementById('btn-attack').style.display = 'inline-block';
-      logBattle(`Début du combat ! L'équipe entière affronte ${enemy.name}.`);
+      updateCombatUI();
+      document.getElementById('combat-actions').style.display = 'block';
+      logBattle(`Début du combat contre ${enemy.name} !`);
     }
 
-    function executeTeamTurn() {
+    function updateCombatUI() {
+      if (!activeBattle) return;
+      let activePoke = activeBattle.team[activeBattle.activeIndex];
+      let t = getTemplate(activePoke.templateId);
+
+      document.getElementById('player-active-name').innerText = `${t.name} (Niv. ${activePoke.level}) [Talent: ${t.ability}]`;
+      document.getElementById('player-img').src = activePoke.isShiny ? t.shinySprite : t.sprite;
+      document.getElementById('enemy-name').innerText = activeBattle.enemy.name;
+      document.getElementById('enemy-img').src = activeBattle.enemy.sprite;
+      document.getElementById('shield-box').style.display = activeBattle.enemy.shield > 0 ? 'block' : 'none';
+
+      updateBattleHp();
+
+      // Afficher les attaques disponibles (jusqu'à 4)
+      let moves = getAvailableMoves(activePoke).slice(-4);
+      let movesGrid = document.getElementById('moves-grid');
+      movesGrid.innerHTML = moves.map(m => `
+        <button class="btn-action" onclick="playerAttack('${m.name}', ${m.power})">${m.name} (${m.power} Pwr)</button>
+      `).join('');
+    }
+
+    function playerAttack(moveName, power) {
       if (!activeBattle) return;
 
-      let currentPoke = activeBattle.team[activeBattle.activeIndex];
-      let t = getTemplate(currentPoke.templateId);
-      let moveObj = t.moves.find(m => m.name === currentPoke.activeMove) || t.moves[0];
-
-      // Afficher le sprite du Pokémon actif
-      document.getElementById('player-img').src = currentPoke.isShiny ? t.shinySprite : t.sprite;
-
-      let dmg = Math.floor((currentPoke.level * 2 + currentPoke.ivs.atk) * (moveObj.power / 20));
+      let activePoke = activeBattle.team[activeBattle.activeIndex];
+      let t = getTemplate(activePoke.templateId);
+      let dmg = Math.floor((activePoke.level * 2 + activePoke.ivs.atk) * (power / 25));
 
       if (activeBattle.enemy.shield > 0) {
         activeBattle.enemy.shield -= dmg;
@@ -455,15 +529,15 @@
           activeBattle.enemy.hp += activeBattle.enemy.shield;
           activeBattle.enemy.shield = 0;
         }
-        logBattle(`${t.name} utilise ${moveObj.name} sur le bouclier ! (${dmg} dégâts)`);
+        logBattle(`${t.name} utilise ${moveName} sur le bouclier ! (${dmg} dégâts)`);
       } else {
         activeBattle.enemy.hp = Math.max(0, activeBattle.enemy.hp - dmg);
-        logBattle(`${t.name} utilise ${moveObj.name} ! ${dmg} dégâts infligés.`);
+        logBattle(`${t.name} utilise ${moveName} ! ${dmg} dégâts infligés.`);
       }
 
       if (activeBattle.enemy.hp <= 0) {
-        logBattle(`🏆 Victoire éclatante ! +600 🪙 et +50 EXP pour l'équipe !`);
-        state.coins += 600;
+        logBattle(`🏆 Victoire ! +500 🪙 et EXP accordée à l'équipe !`);
+        state.coins += 500;
         activeBattle.team.forEach(p => {
           p.exp += 50;
           if (p.exp >= 100) {
@@ -472,23 +546,54 @@
             let template = getTemplate(p.templateId);
             if (template.evoId && p.level >= template.evoLevel) {
               p.templateId = template.evoId;
-              logBattle(`✨ ${template.name} a évolué !`);
+              logBattle(`✨ Évolution ! ${template.name} a évolué !`);
             }
           }
         });
-        document.getElementById('btn-attack').style.display = 'none';
+        document.getElementById('combat-actions').style.display = 'none';
         updateUI();
         return;
       }
 
-      let enemyDmg = activeBattle.enemy.atk;
-      logBattle(`${activeBattle.enemy.name} riposte et inflige ${enemyDmg} dégâts.`);
-
-      activeBattle.activeIndex = (activeBattle.activeIndex + 1) % activeBattle.team.length;
-      let nextPoke = activeBattle.team[activeBattle.activeIndex];
-      logBattle(`-> Changement de Pokémon actif : ${getTemplate(nextPoke.templateId).name}`);
+      // Tour ennemi (Riposte)
+      setTimeout(() => {
+        if (!activeBattle) return;
+        let enemyDmg = activeBattle.enemy.atk;
+        logBattle(`${activeBattle.enemy.name} riposte et inflige ${enemyDmg} dégâts à ${t.name}.`);
+        updateBattleHp();
+      }, 500);
 
       updateBattleHp();
+    }
+
+    function openSwapModal() {
+      if (!activeBattle) return;
+      let modal = document.getElementById('swap-modal');
+      let list = document.getElementById('swap-list');
+      list.innerHTML = '';
+
+      activeBattle.team.forEach((p, idx) => {
+        let t = getTemplate(p.templateId);
+        let card = document.createElement('div');
+        card.className = `poke-card ${p.isShiny ? 'shiny' : ''}`;
+        card.innerHTML = `
+          <img src="${p.isShiny ? t.shinySprite : t.sprite}" />
+          <h4>${t.name}</h4>
+          <p>Niv. ${p.level}</p>
+          <button class="btn-action btn-blue" style="font-size:0.7em;" onclick="swapPokemon(${idx})">Envoyer</button>
+        `;
+        list.appendChild(card);
+      });
+      modal.style.display = 'flex';
+    }
+
+    function swapPokemon(idx) {
+      activeBattle.activeIndex = idx;
+      let activePoke = activeBattle.team[idx];
+      let t = getTemplate(activePoke.templateId);
+      logBattle(`🔄 Entrée en scène de ${t.name} !`);
+      closeModal('swap-modal');
+      updateCombatUI();
     }
 
     function updateBattleHp() {
