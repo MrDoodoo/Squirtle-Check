@@ -1,1 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokémon Egg Gacha & Tactical RPG</title>
+  <style>
+    :root {
+      --bg-color: #0d1117;
+      --panel-bg: #161b22;
+      --card-bg: #21262d;
+      --accent: #238636;
+      --accent-hover: #2ea043;
+      --text: #c9d1d9;
+      --shiny-gold: #f1e05a;
+      --border: #30363d;
+    }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg-color); color: var(--text); padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+
+    header { text-align: center; margin-bottom: 20px; }
+    h1 { color: #58a6ff; font-size: 2.2em; margin-bottom: 8px; }
+
+    .currencies { display: flex; gap: 20px; background: var(--panel-bg); border: 1px solid var(--border); padding: 10px 25px; border-radius: 20px; margin-bottom: 20px; }
+    .currency-item { font-weight: bold; font-size: 1.05em; }
+
+    nav { display: flex; gap: 10px; margin-bottom: 20px; }
+    button.nav-btn { padding: 10px 20px; border: 1px solid var(--border); background: var(--panel-bg); color: var(--text); border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+    button.nav-btn.active, button.nav-btn:hover { background: var(--accent); color: white; border-color: transparent; }
+
+    .tab-content { display: none; width: 100%; max-width: 950px; background: var(--panel-bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+    .tab-content.active { display: block; }
+
+    /* Gacha / Incubateur */
+    .egg-incubator { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; border: 2px dashed var(--border); border-radius: 12px; background: rgba(0,0,0,0.2); }
+    .egg-icon { font-size: 4em; margin-bottom: 15px; animation: bounce 2s infinite; }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    .btn-action { padding: 10px 20px; font-size: 1em; background: var(--accent); border: none; color: white; border-radius: 6px; cursor: pointer; font-weight: bold; margin: 5px; }
+    .btn-action:hover { background: var(--accent-hover); }
+
+    /* Grid Collection */
+    .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-top: 15px; }
+    .poke-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; position: relative; }
+    .poke-card.shiny { border-color: var(--shiny-gold); box-shadow: 0 0 10px rgba(241, 224, 90, 0.3); }
+    .poke-card img { width: 90px; height: 90px; object-fit: contain; }
+    .badge-shiny { position: absolute; top: 8px; right: 8px; background: var(--shiny-gold); color: #000; font-size: 0.7em; font-weight: bold; padding: 2px 6px; border-radius: 4px; }
+
+    /* Stats IV/EV */
+    .stat-list { text-align: left; font-size: 0.8em; margin-top: 8px; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 4px; font-family: monospace; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>⚡ Pokémon Egg Gacha & RPG ⚡</h1>
+    <div class="currencies">
+      <div class="currency-item">🥚 Œufs en Stock: <span id="egg-count">5</span></div>
+      <div class="currency-item">🪙 Pokédollars: <span id="coins-count">1000</span></div>
+    </div>
+  </header>
+
+  <nav>
+    <button class="nav-btn active" onclick="switchTab('gacha')">🥚 Couvoir (Gacha)</button>
+    <button class="nav-btn" onclick="switchTab('box')">📦 Boîte (Collection & IV)</button>
+  </nav>
+
+  <!-- TAB: GACHA -->
+  <div id="tab-gacha" class="tab-content active">
+    <h2>Incubateur d'Œufs</h2>
+    <p style="margin-bottom: 20px; opacity: 0.8;">Faites éclore vos œufs pour obtenir des Pokémon dotés d'IV uniques et tenter d'obtenir une variante Shiny !</p>
+    
+    <div class="egg-incubator">
+      <div class="egg-icon">🥚</div>
+      <button class="btn-action" onclick="hatchEgg()">Faire éclore 1 Œuf</button>
+    </div>
+    
+    <div id="hatch-result" style="margin-top: 20px; text-align: center;"></div>
+  </div>
+
+  <!-- TAB: BOX -->
+  <div id="tab-box" class="tab-content">
+    <h2>Ma Boîte Pokémon (<span id="box-count">0</span>)</h2>
+    <div id="box-grid" class="grid-container"></div>
+  </div>
+
+  <script>
+    // Base de données simulée des Pokémon (Compatible avec 9 Générations)
+    const POKEMON_DB = [
+      { id: 1, name: "Bulbizarre", type1: "Plante", baseStats: { hp: 45, atk: 49, def: 49, spa: 65, spd: 65, spe: 45 }, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png", shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1.png" },
+      { id: 4, name: "Salamèche", type1: "Feu", baseStats: { hp: 39, atk: 52, def: 43, spa: 60, spd: 50, spe: 65 }, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png", shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/4.png" },
+      { id: 7, name: "Carapuce", type1: "Eau", baseStats: { hp: 44, atk: 48, def: 65, spa: 50, spd: 64, spe: 43 }, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png", shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/7.png" },
+      { id: 150, name: "Mewtwo", type1: "Psy", baseStats: { hp: 106, atk: 110, def: 90, spa: 154, spd: 90, spe: 130 }, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png", shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/150.png" },
+      { id: 384, name: "Rayquaza", type1: "Dragon", baseStats: { hp: 105, atk: 150, def: 90, spa: 150, spd: 90, spe: 95 }, sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/384.png", shinySprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/384.png" }
+    ];
+
+    let state = {
+      eggs: 5,
+      coins: 1000,
+      collection: []
+    };
+
+    function updateUI() {
+      document.getElementById('egg-count').innerText = state.eggs;
+      document.getElementById('coins-count').innerText = state.coins;
+      document.getElementById('box-count').innerText = state.collection.length;
+      renderBox();
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(`tab-${tabId}`).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function hatchEgg() {
+      if (state.eggs <= 0) {
+        alert("Plus d'œufs disponibles !");
+        return;
+      }
+
+      state.eggs--;
+      const template = POKEMON_DB[Math.floor(Math.random() * POKEMON_DB.length)];
+      const isShiny = Math.random() < 0.1; // 10% de chance pour le prototype
+
+      const ivs = {
+        hp: Math.floor(Math.random() * 32),
+        atk: Math.floor(Math.random() * 32),
+        def: Math.floor(Math.random() * 32),
+        spa: Math.floor(Math.random() * 32),
+        spd: Math.floor(Math.random() * 32),
+        spe: Math.floor(Math.random() * 32)
+      };
+
+      const pokemon = {
+        ...template,
+        isShiny,
+        ivs,
+        uid: Date.now() + Math.random()
+      };
+
+      state.collection.push(pokemon);
+
+      const resultDiv = document.getElementById('hatch-result');
+      resultDiv.innerHTML = `
+        <div class="poke-card ${isShiny ? 'shiny' : ''}" style="margin: 0 auto; width: 200px;">
+          ${isShiny ? '<div class="badge-shiny">SHINY</div>' : ''}
+          <img src="${isShiny ? pokemon.shinySprite : pokemon.sprite}" />
+          <h3>${pokemon.name}</h3>
+          <p style="font-size:0.8em; color:#58a6ff;">Éclosion réussie !</p>
+        </div>
+      `;
+
+      updateUI();
+    }
+
+    function renderBox() {
+      const grid = document.getElementById('box-grid');
+      grid.innerHTML = '';
+      state.collection.forEach(p => {
+        const card = document.createElement('div');
+        card.className = `poke-card ${p.isShiny ? 'shiny' : ''}`;
+        card.innerHTML = `
+          ${p.isShiny ? '<div class="badge-shiny">SHINY</div>' : ''}
+          <img src="${p.isShiny ? p.shinySprite : p.sprite}" />
+          <h4>${p.name}</h4>
+          <div class="stat-list">
+            <div>PV IV: ${p.ivs.hp}/31</div>
+            <div>ATK IV: ${p.ivs.atk}/31</div>
+            <div>DEF IV: ${p.ivs.def}/31</div>
+            <div>SPE IV: ${p.ivs.spe}/31</div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    updateUI();
+  </script>
+</body>
+</html>
