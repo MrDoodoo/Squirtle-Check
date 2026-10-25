@@ -1,37 +1,477 @@
 [
-  { 
-    "id": 1, "name": "Bulbizarre", "evoId": 2, "evoLevel": 16, "type1": "Plante", "ability": "Engrais", "hiddenAbility": "Chlorophylle",
+  {
+    "id": 1,
+    "name": "Bulbizarre",
+    "evoId": 2,
+    "evoLevel": 16,
+    "type1": "Plante",
+    "type2": "Poison",
+    "ability": "Engrais",
+    "hiddenAbility": "Chlorophylle",
     "baseStats": { "hp": 45, "atk": 49, "def": 49, "spe": 45 },
     "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
     "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1.png",
-    "learnset": { "1": { "name": "Charge", "power": 40 }, "5": { "name": "Fouet Lianes", "power": 45 }, "12": { "name": "Tranch'Herbe", "power": 55 }, "22": { "name": "Lance-Soleil", "power": 120 } }
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "5": { "name": "Fouet Lianes", "power": 45 },
+      "12": { "name": "Tranch'Herbe", "power": 55 },
+      "22": { "name": "Lance-Soleil", "power": 120 }
+    }
   },
-  { 
-    "id": 4, "name": "Salamèche", "evoId": 5, "evoLevel": 16, "type1": "Feu", "ability": "Brasier", "hiddenAbility": "Force Soleil",
+  {
+    "id": 2,
+    "name": "Herbizarre",
+    "evoId": 3,
+    "evoLevel": 32,
+    "type1": "Plante",
+    "type2": "Poison",
+    "ability": "Engrais",
+    "hiddenAbility": "Chlorophylle",
+    "baseStats": { "hp": 60, "atk": 62, "def": 63, "spe": 60 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/2.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/2.png",
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "7": { "name": "Fouet Lianes", "power": 45 },
+      "18": { "name": "Tranch'Herbe", "power": 55 },
+      "30": { "name": "Lance-Soleil", "power": 120 }
+    }
+  },
+  {
+    "id": 3,
+    "name": "Florizarre",
+    "evoId": null,
+    "evoLevel": 99,
+    "type1": "Plante",
+    "type2": "Poison",
+    "ability": "Engrais",
+    "hiddenAbility": "Chlorophylle",
+    "baseStats": { "hp": 80, "atk": 82, "def": 83, "spe": 80 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/3.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/3.png",
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "10": { "name": "Fouet Lianes", "power": 45 },
+      "20": { "name": "Tranch'Herbe", "power": 55 },
+      "35": { "name": "Lance-Soleil", "power": 120 }
+    }
+  },
+  {
+    "id": 4,
+    "name": "Salamèche",
+    "evoId": 5,
+    "evoLevel": 16,
+    "type1": "Feu",
+    "type2": null,
+    "ability": "Brasier",
+    "hiddenAbility": "Force Soleil",
     "baseStats": { "hp": 39, "atk": 52, "def": 43, "spe": 65 },
     "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png",
     "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/4.png",
-    "learnset": { "1": { "name": "Griffe", "power": 40 }, "6": { "name": "Flammèche", "power": 40 }, "15": { "name": "Dracogriffe", "power": 80 }, "25": { "name": "Déflagration", "power": 110 } }
+    "learnset": {
+      "1": { "name": "Griffe", "power": 40 },
+      "6": { "name": "Flammèche", "power": 40 },
+      "15": { "name": "Dracogriffe", "power": 80 },
+      "25": { "name": "Déflagration", "power": 110 }
+    }
   },
-  { 
-    "id": 7, "name": "Carapuce", "evoId": 8, "evoLevel": 16, "type1": "Eau", "ability": "Torrent", "hiddenAbility": "Cuvette",
+  {
+    "id": 5,
+    "name": "Reptincel",
+    "evoId": 6,
+    "evoLevel": 36,
+    "type1": "Feu",
+    "type2": null,
+    "ability": "Brasier",
+    "hiddenAbility": "Force Soleil",
+    "baseStats": { "hp": 58, "atk": 64, "def": 58, "spe": 80 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/5.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/5.png",
+    "learnset": {
+      "1": { "name": "Griffe", "power": 40 },
+      "7": { "name": "Flammèche", "power": 40 },
+      "16": { "name": "Dracogriffe", "power": 80 },
+      "30": { "name": "Déflagration", "power": 110 }
+    }
+  },
+  {
+    "id": 6,
+    "name": "Dracaufeu",
+    "evoId": null,
+    "evoLevel": 99,
+    "type1": "Feu",
+    "type2": "Vol",
+    "ability": "Brasier",
+    "hiddenAbility": "Force Soleil",
+    "baseStats": { "hp": 78, "atk": 84, "def": 78, "spe": 100 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/6.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/6.png",
+    "learnset": {
+      "1": { "name": "Griffe", "power": 40 },
+      "10": { "name": "Flammèche", "power": 40 },
+      "22": { "name": "Dracogriffe", "power": 80 },
+      "40": { "name": "Déflagration", "power": 110 }
+    }
+  },
+  {
+    "id": 7,
+    "name": "Carapuce",
+    "evoId": 8,
+    "evoLevel": 16,
+    "type1": "Eau",
+    "type2": null,
+    "ability": "Torrent",
+    "hiddenAbility": "Cuvette",
     "baseStats": { "hp": 44, "atk": 48, "def": 65, "spe": 43 },
     "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
     "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/7.png",
-    "learnset": { "1": { "name": "Charge", "power": 40 }, "7": { "name": "Pistolet à O", "power": 40 }, "16": { "name": "Morsure", "power": 60 }, "28": { "name": "Hydro-Pump", "power": 110 } }
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "7": { "name": "Pistolet à O", "power": 40 },
+      "16": { "name": "Morsure", "power": 60 },
+      "28": { "name": "Hydroblast", "power": 110 }
+    }
   },
-  { 
-    "id": 150, "name": "Mewtwo", "evoId": null, "evoLevel": 99, "type1": "Psy", "ability": "Pression", "hiddenAbility": "Tentative",
+  {
+    "id": 8,
+    "name": "Carabaffe",
+    "evoId": 9,
+    "evoLevel": 36,
+    "type1": "Eau",
+    "type2": null,
+    "ability": "Torrent",
+    "hiddenAbility": "Cuvette",
+    "baseStats": { "hp": 59, "atk": 63, "def": 80, "spe": 58 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/8.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/8.png",
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "8": { "name": "Pistolet à O", "power": 40 },
+      "18": { "name": "Morsure", "power": 60 },
+      "32": { "name": "Hydroblast", "power": 110 }
+    }
+  },
+  {
+    "id": 9,
+    "name": "Tortank",
+    "evoId": null,
+    "evoLevel": 99,
+    "type1": "Eau",
+    "type2": null,
+    "ability": "Torrent",
+    "hiddenAbility": "Cuvette",
+    "baseStats": { "hp": 79, "atk": 83, "def": 100, "spe": 78 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/9.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/9.png",
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "10": { "name": "Pistolet à O", "power": 40 },
+      "20": { "name": "Morsure", "power": 60 },
+      "35": { "name": "Hydroblast", "power": 110 }
+    }
+  },
+  {
+    "id": 25,
+    "name": "Pikachu",
+    "evoId": 26,
+    "evoLevel": 22,
+    "type1": "Électrik",
+    "type2": null,
+    "ability": "Statik",
+    "hiddenAbility": "Paratonnerre",
+    "baseStats": { "hp": 35, "atk": 55, "def": 40, "spe": 90 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/25.png",
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "7": { "name": "Tonnerre", "power": 90 },
+      "15": { "name": "Éclair", "power": 60 },
+      "25": { "name": "Fatal-Foudre", "power": 120 }
+    }
+  },
+  {
+    "id": 26,
+    "name": "Raichu",
+    "evoId": null,
+    "evoLevel": 99,
+    "type1": "Électrik",
+    "type2": null,
+    "ability": "Statik",
+    "hiddenAbility": "Paratonnerre",
+    "baseStats": { "hp": 60, "atk": 90, "def": 55, "spe": 110 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/26.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/26.png",
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "10": { "name": "Tonnerre", "power": 90 },
+      "18": { "name": "Éclair", "power": 60 },
+      "30": { "name": "Fatal-Foudre", "power": 120 }
+    }
+  },
+  {
+    "id": 52,
+    "name": "Miaouss",
+    "evoId": 53,
+    "evoLevel": 18,
+    "type1": "Normal",
+    "type2": null,
+    "ability": "Échauffement",
+    "hiddenAbility": "Technicien",
+    "baseStats": { "hp": 40, "atk": 45, "def": 35, "spe": 90 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/52.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/52.png",
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "8": { "name": "Griffe", "power": 40 },
+      "14": { "name": "Morsure", "power": 60 },
+      "22": { "name": "Tranche", "power": 70 }
+    }
+  },
+  {
+    "id": 94,
+    "name": "Ectoplasma",
+    "evoId": null,
+    "evoLevel": 99,
+    "type1": "Spectre",
+    "type2": "Poison",
+    "ability": "Lévitation",
+    "hiddenAbility": "Lévitation",
+    "baseStats": { "hp": 60, "atk": 65, "def": 60, "spe": 110 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/94.png",
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "8": { "name": "Ball'Ombre", "power": 60 },
+      "18": { "name": "Coup de Jus", "power": 70 },
+      "30": { "name": "Exploforce", "power": 120 }
+    }
+  },
+  {
+    "id": 133,
+    "name": "Évoli",
+    "evoId": 134,
+    "evoLevel": 25,
+    "type1": "Normal",
+    "type2": null,
+    "ability": "Adaptabilité",
+    "hiddenAbility": "Anticipation",
+    "baseStats": { "hp": 55, "atk": 55, "def": 50, "spe": 55 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/133.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/133.png",
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "8": { "name": "Morsure", "power": 60 },
+      "17": { "name": "Vent Violent", "power": 70 },
+      "30": { "name": "Ultimawashi", "power": 120 }
+    }
+  },
+  {
+    "id": 134,
+    "name": "Aquali",
+    "evoId": null,
+    "evoLevel": 99,
+    "type1": "Eau",
+    "type2": null,
+    "ability": "Torrent",
+    "hiddenAbility": "Hydratation",
+    "baseStats": { "hp": 130, "atk": 65, "def": 60, "spe": 65 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/134.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/134.png",
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "10": { "name": "Hydroblast", "power": 110 },
+      "20": { "name": "Pistolet à O", "power": 40 },
+      "35": { "name": "Surf", "power": 90 }
+    }
+  },
+  {
+    "id": 135,
+    "name": "Voltali",
+    "evoId": null,
+    "evoLevel": 99,
+    "type1": "Électrik",
+    "type2": null,
+    "ability": "Statik",
+    "hiddenAbility": "Paratonnerre",
+    "baseStats": { "hp": 65, "atk": 65, "def": 60, "spe": 130 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/135.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/135.png",
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "10": { "name": "Tonnerre", "power": 90 },
+      "18": { "name": "Éclair", "power": 60 },
+      "30": { "name": "Fatal-Foudre", "power": 120 }
+    }
+  },
+  {
+    "id": 136,
+    "name": "Pyroli",
+    "evoId": null,
+    "evoLevel": 99,
+    "type1": "Feu",
+    "type2": null,
+    "ability": "Brasier",
+    "hiddenAbility": "Force Soleil",
+    "baseStats": { "hp": 65, "atk": 130, "def": 60, "spe": 65 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/136.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/136.png",
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "10": { "name": "Flammèche", "power": 40 },
+      "18": { "name": "Feu Follet", "power": 95 },
+      "30": { "name": "Déflagration", "power": 110 }
+    }
+  },
+  {
+    "id": 150,
+    "name": "Mewtwo",
+    "evoId": null,
+    "evoLevel": 99,
+    "type1": "Psy",
+    "type2": null,
+    "ability": "Pression",
+    "hiddenAbility": "Technicien",
     "baseStats": { "hp": 106, "atk": 110, "def": 90, "spe": 130 },
     "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png",
     "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/150.png",
-    "learnset": { "1": { "name": "Choc Mental", "power": 50 }, "10": { "name": "Aurasphère", "power": 80 }, "30": { "name": "Psyko", "power": 90 }, "50": { "name": "Frappe Psyschique", "power": 100 } }
+    "learnset": {
+      "1": { "name": "Choc Mental", "power": 50 },
+      "12": { "name": "Aurasphère", "power": 80 },
+      "25": { "name": "Psyko", "power": 90 },
+      "45": { "name": "Frappe Psy", "power": 140 }
+    }
   },
-  { 
-    "id": 384, "name": "Rayquaza", "evoId": null, "evoLevel": 99, "type1": "Dragon", "ability": "Air Lock", "hiddenAbility": "Air Lock",
+  {
+    "id": 151,
+    "name": "Mew",
+    "evoId": null,
+    "evoLevel": 99,
+    "type1": "Psy",
+    "type2": null,
+    "ability": "Synchro",
+    "hiddenAbility": "Synchro",
+    "baseStats": { "hp": 100, "atk": 100, "def": 100, "spe": 100 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/151.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/151.png",
+    "learnset": {
+      "1": { "name": "Choc Mental", "power": 50 },
+      "10": { "name": "Aurasphère", "power": 80 },
+      "20": { "name": "Psyko", "power": 90 },
+      "35": { "name": "Frappe Psy", "power": 140 }
+    }
+  },
+  {
+    "id": 196,
+    "name": "Évoli",
+    "evoId": null,
+    "evoLevel": 99,
+    "type1": "Psy",
+    "type2": null,
+    "ability": "Synchronise",
+    "hiddenAbility": "Peau Miracle",
+    "baseStats": { "hp": 70, "atk": 70, "def": 65, "spe": 95 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/196.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/196.png",
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "10": { "name": "Choc Mental", "power": 50 },
+      "22": { "name": "Aurasphère", "power": 80 },
+      "35": { "name": "Psyko", "power": 90 }
+    }
+  },
+  {
+    "id": 248,
+    "name": "Tyranocif",
+    "evoId": null,
+    "evoLevel": 99,
+    "type1": "Roche",
+    "type2": "Dragon",
+    "ability": "Armurbaston",
+    "hiddenAbility": "Armurbaston",
+    "baseStats": { "hp": 100, "atk": 134, "def": 110, "spe": 95 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/248.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/248.png",
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "12": { "name": "Dracogriffe", "power": 80 },
+      "25": { "name": "Colère", "power": 120 },
+      "40": { "name": "Dracofeu", "power": 130 }
+    }
+  },
+  {
+    "id": 384,
+    "name": "Rayquaza",
+    "evoId": null,
+    "evoLevel": 99,
+    "type1": "Dragon",
+    "type2": "Vol",
+    "ability": "Air Lock",
+    "hiddenAbility": "Air Lock",
     "baseStats": { "hp": 105, "atk": 150, "def": 90, "spe": 95 },
     "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/384.png",
     "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/384.png",
-    "learnset": { "1": { "name": "Dracogriffe", "power": 80 }, "15": { "name": "Vol", "power": 90 }, "40": { "name": "Colère", "power": 120 }, "60": { "name": "Dracoflécho", "power": 140 } }
+    "learnset": {
+      "1": { "name": "Dracogriffe", "power": 80 },
+      "15": { "name": "Vol", "power": 90 },
+      "40": { "name": "Colère", "power": 120 },
+      "60": { "name": "Dracofeu", "power": 130 }
+    }
+  },
+  {
+    "id": 448,
+    "name": "Lucario",
+    "evoId": null,
+    "evoLevel": 99,
+    "type1": "Combat",
+    "type2": "Acier",
+    "ability": "Force-Âme",
+    "hiddenAbility": "Technicien",
+    "baseStats": { "hp": 70, "atk": 110, "def": 70, "spe": 90 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/448.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/448.png",
+    "learnset": {
+      "1": { "name": "Morsure", "power": 60 },
+      "12": { "name": "Poing Feu", "power": 75 },
+      "20": { "name": "Poing Glace", "power": 75 },
+      "30": { "name": "Aura Sphere", "power": 90 }
+    }
+  },
+  {
+    "id": 493,
+    "name": "Archeodong",
+    "evoId": null,
+    "evoLevel": 99,
+    "type1": "Dragon",
+    "type2": "Vol",
+    "ability": "Multi-Coups",
+    "hiddenAbility": "Multi-Coups",
+    "baseStats": { "hp": 90, "atk": 100, "def": 80, "spe": 110 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/493.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/493.png",
+    "learnset": {
+      "1": { "name": "Dracogriffe", "power": 80 },
+      "14": { "name": "Coup d'Boule", "power": 90 },
+      "25": { "name": "Aéroblast", "power": 120 },
+      "40": { "name": "Draco-Météore", "power": 130 }
+    }
+  },
+  {
+    "id": 719,
+    "name": "Diancie",
+    "evoId": null,
+    "evoLevel": 99,
+    "type1": "Roche",
+    "type2": "Fée",
+    "ability": "Génération",
+    "hiddenAbility": "Génération",
+    "baseStats": { "hp": 50, "atk": 100, "def": 150, "spe": 100 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/719.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/719.png",
+    "learnset": {
+      "1": { "name": "Charge", "power": 40 },
+      "10": { "name": "Pierre Éclat", "power": 70 },
+      "20": { "name": "Éclat Magique", "power": 80 },
+      "35": { "name": "Giga Impact", "power": 130 }
+    }
   }
 ]
