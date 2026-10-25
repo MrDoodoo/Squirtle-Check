@@ -1,36 +1,37 @@
 [
-  {
-    "id": 1,
-    "name": "Bulbizarre",
-    "generation": 1,
-    "type1": "Plante",
-    "type2": "Poison",
-    "rarity": 3,
-    "baseStats": { "hp": 45, "atk": 49, "def": 49, "spa": 65, "spd": 65, "spe": 45 },
+  { 
+    "id": 1, "name": "Bulbizarre", "evoId": 2, "evoLevel": 16, "type1": "Plante", "ability": "Engrais",
+    "baseStats": { "hp": 45, "atk": 49, "def": 49, "spe": 45 },
     "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
-    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1.png"
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1.png",
+    "learnset": { "1": { "name": "Charge", "power": 40 }, "5": { "name": "Fouet Lianes", "power": 45 }, "12": { "name": "Tranch'Herbe", "power": 55 }, "22": { "name": "Lance-Soleil", "power": 120 } }
   },
-  {
-    "id": 4,
-    "name": "Salamèche",
-    "generation": 1,
-    "type1": "Feu",
-    "type2": null,
-    "rarity": 3,
-    "baseStats": { "hp": 39, "atk": 52, "def": 43, "spa": 60, "spd": 50, "spe": 65 },
+  { 
+    "id": 4, "name": "Salamèche", "evoId": 5, "evoLevel": 16, "type1": "Feu", "ability": "Brasier",
+    "baseStats": { "hp": 39, "atk": 52, "def": 43, "spe": 65 },
     "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png",
-    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/4.png"
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/4.png",
+    "learnset": { "1": { "name": "Griffe", "power": 40 }, "6": { "name": "Flammèche", "power": 40 }, "15": { "name": "Dracogriffe", "power": 80 }, "25": { "name": "Déflagration", "power": 110 } }
   },
-  {
-    "id": 150,
-    "name": "Mewtwo",
-    "generation": 1,
-    "type1": "Psy",
-    "type2": null,
-    "rarity": 5,
-    "legendary": true,
-    "baseStats": { "hp": 106, "atk": 110, "def": 90, "spa": 154, "spd": 90, "spe": 130 },
+  { 
+    "id": 7, "name": "Carapuce", "evoId": 8, "evoLevel": 16, "type1": "Eau", "ability": "Torrent",
+    "baseStats": { "hp": 44, "atk": 48, "def": 65, "spe": 43 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/7.png",
+    "learnset": { "1": { "name": "Charge", "power": 40 }, "7": { "name": "Pistolet à O", "power": 40 }, "16": { "name": "Morsure", "power": 60 }, "28": { "name": "Hydro-Pump", "power": 110 } }
+  },
+  { 
+    "id": 150, "name": "Mewtwo", "evoId": null, "evoLevel": 99, "type1": "Psy", "ability": "Pression",
+    "baseStats": { "hp": 106, "atk": 110, "def": 90, "spe": 130 },
     "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png",
-    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/150.png"
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/150.png",
+    "learnset": { "1": { "name": "Choc Mental", "power": 50 }, "10": { "name": "Aurasphère", "power": 80 }, "30": { "name": "Psyko", "power": 90 }, "50": { "name": "Frappe Psyschique", "power": 100 } }
+  },
+  { 
+    "id": 384, "name": "Rayquaza", "evoId": null, "evoLevel": 99, "type1": "Dragon", "ability": "Air Lock",
+    "baseStats": { "hp": 105, "atk": 150, "def": 90, "spe": 95 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/384.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/384.png",
+    "learnset": { "1": { "name": "Dracogriffe", "power": 80 }, "15": { "name": "Vol", "power": 90 }, "40": { "name": "Colère", "power": 120 }, "60": { "name": "Dracoflécho", "power": 140 } }
   }
 ]
