@@ -1,0 +1,36 @@
+[
+  {
+    "id": 1,
+    "name": "Bulbizarre",
+    "generation": 1,
+    "type1": "Plante",
+    "type2": "Poison",
+    "rarity": 3,
+    "baseStats": { "hp": 45, "atk": 49, "def": 49, "spa": 65, "spd": 65, "spe": 45 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1.png"
+  },
+  {
+    "id": 4,
+    "name": "Salamèche",
+    "generation": 1,
+    "type1": "Feu",
+    "type2": null,
+    "rarity": 3,
+    "baseStats": { "hp": 39, "atk": 52, "def": 43, "spa": 60, "spd": 50, "spe": 65 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/4.png"
+  },
+  {
+    "id": 150,
+    "name": "Mewtwo",
+    "generation": 1,
+    "type1": "Psy",
+    "type2": null,
+    "rarity": 5,
+    "legendary": true,
+    "baseStats": { "hp": 106, "atk": 110, "def": 90, "spa": 154, "spd": 90, "spe": 130 },
+    "sprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png",
+    "shinySprite": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/150.png"
+  }
+]
