@@ -265,13 +265,95 @@
       return zones[Math.min(state.zone - 1, zones.length - 1)];
     }
 
+    function capitalizeName(name) {
+      return name
+        .split('-')
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+    }
+
+    function buildFallbackPokemon(pokemon, index = 0) {
+      const moves = [
+        { name: 'Charge', power: 40 },
+        { name: 'Morsure', power: 60 },
+        { name: 'Tranch Herbe', power: 70 },
+        { name: 'Flammèche', power: 60 },
+        { name: 'Pistolet à O', power: 65 },
+        { name: 'Coup de Pied', power: 80 }
+      ];
+
+      const gen = Math.min(9, Math.floor((pokemon.id - 1) / 151) + 1);
+      const type1 = pokemon.types?.[0]?.type?.name || 'Normal';
+      const type2 = pokemon.types?.[1]?.type?.name || null;
+      const abilities = pokemon.abilities || [];
+
+      return {
+        id: pokemon.id,
+        name: capitalizeName(pokemon.name),
+        type1: type1.charAt(0).toUpperCase() + type1.slice(1),
+        type2: type2 ? type2.charAt(0).toUpperCase() + type2.slice(1) : null,
+        ability: abilities[0]?.ability?.name ? capitalizeName(abilities[0].ability.name) : 'Aucune',
+        hiddenAbility: abilities[1]?.ability?.name ? capitalizeName(abilities[1].ability.name) : (abilities[0]?.ability?.name ? capitalizeName(abilities[0].ability.name) : 'Aucune'),
+        baseStats: {
+          hp: pokemon.stats?.[0]?.base_stat || 1,
+          atk: pokemon.stats?.[1]?.base_stat || 1,
+          def: pokemon.stats?.[2]?.base_stat || 1,
+          spe: pokemon.stats?.[5]?.base_stat || 1
+        },
+        evYield: {
+          hp: pokemon.stats?.[0]?.effort || 0,
+          atk: pokemon.stats?.[1]?.effort || 0,
+          def: pokemon.stats?.[2]?.effort || 0,
+          spe: pokemon.stats?.[5]?.effort || 0
+        },
+        generation: gen,
+        sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`,
+        shinySprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.id}.png`,
+        learnset: {
+          1: moves[index % moves.length],
+          6: moves[(index + 1) % moves.length],
+          18: moves[(index + 2) % moves.length],
+          30: moves[(index + 3) % moves.length]
+        }
+      };
+    }
+
     async function loadPokemonData() {
       try {
-        let response = await fetch('./data/pokemons.json');
-        POKEMON_DB = await response.json();
-        updateUI();
+        const localResponse = await fetch('./data/pokemons.json');
+        if (localResponse.ok) {
+          const localData = await localResponse.json();
+          if (Array.isArray(localData) && localData.length > 0) {
+            POKEMON_DB = localData;
+            updateUI();
+            return;
+          }
+        }
       } catch (e) {
-        console.error('Erreur de chargement JSON', e);
+        console.warn('Aucune base locale trouvée, utilisation de l’API PokéAPI.', e);
+      }
+
+      try {
+        const listResponse = await fetch('https://pokeapi.co/api/v2/pokemon?limit=1025');
+        const list = await listResponse.json();
+        const results = list.results || [];
+
+        const data = await Promise.all(results.map(async (entry, index) => {
+          const detailResponse = await fetch(entry.url);
+          const detail = await detailResponse.json();
+          return buildFallbackPokemon(detail, index);
+        }));
+
+        POKEMON_DB = data;
+        updateUI();
+      } catch (error) {
+        console.error('Erreur de chargement complet via PokéAPI', error);
+        POKEMON_DB = [
+          { id: 1, name: 'Bulbizarre', type1: 'Plante', ability: 'Engrais', hiddenAbility: 'Chlorophylle', baseStats: { hp: 45, atk: 49, def: 49, spe: 45 }, evYield: { hp: 0, atk: 0, def: 0, spe: 0 }, generation: 1, sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png', shinySprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/1.png', learnset: { 1: { name: 'Charge', power: 40 }, 5: { name: 'Fouet Lianes', power: 45 }, 12: { name: 'Tranch Herbe', power: 55 } } },
+          { id: 4, name: 'Salamèche', type1: 'Feu', ability: 'Brasier', hiddenAbility: 'Force Soleil', baseStats: { hp: 39, atk: 52, def: 43, spe: 65 }, evYield: { hp: 0, atk: 0, def: 0, spe: 0 }, generation: 1, sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png', shinySprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/4.png', learnset: { 1: { name: 'Griffe', power: 40 }, 6: { name: 'Flammèche', power: 40 }, 15: { name: 'Dracogriffe', power: 80 } } },
+          { id: 7, name: 'Carapuce', type1: 'Eau', ability: 'Torrent', hiddenAbility: 'Cuvette', baseStats: { hp: 44, atk: 48, def: 65, spe: 43 }, evYield: { hp: 0, atk: 0, def: 0, spe: 0 }, generation: 1, sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png', shinySprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/7.png', learnset: { 1: { name: 'Charge', power: 40 }, 7: { name: 'Pistolet à O', power: 40 }, 16: { name: 'Morsure', power: 60 } } }
+        ];
+        updateUI();
       }
     }
 
