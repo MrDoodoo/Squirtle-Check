@@ -17,6 +17,7 @@
       --purple-raid: #8e44ad;
       --blue-action: #1f6feb;
       --danger: #da3633;
+      --warning: #f59e0b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
@@ -25,11 +26,11 @@
     header { text-align: center; margin-bottom: 15px; }
     h1 { color: #58a6ff; font-size: 2em; margin-bottom: 5px; }
 
-    .currencies { display: flex; gap: 15px; background: var(--panel-bg); border: 1px solid var(--border); padding: 8px 20px; border-radius: 20px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; font-size: 0.9em; }
+    .currencies { display: flex; gap: 15px; background: var(--panel-bg); border: 1px solid var(--border); padding: 8px 20px; border-radius: 20px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; }
     .currency-item { font-weight: bold; }
 
     nav { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; justify-content: center; }
-    button.nav-btn { padding: 8px 16px; border: 1px solid var(--border); background: var(--panel-bg); color: var(--text); border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s; font-size: 0.9em; }
+    button.nav-btn { padding: 8px 16px; border: 1px solid var(--border); background: var(--panel-bg); color: var(--text); border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
     button.nav-btn.active, button.nav-btn:hover { background: var(--accent); color: white; border-color: transparent; }
 
     .tab-content { display: none; width: 100%; max-width: 1050px; background: var(--panel-bg); border: 1px solid var(--border); border-radius: 10px; padding: 15px; }
@@ -43,9 +44,10 @@
 
     .btn-action { padding: 5px 10px; font-size: 0.8em; background: var(--accent); border: none; color: white; border-radius: 4px; cursor: pointer; font-weight: bold; margin: 2px; transition: background 0.2s; }
     .btn-action:hover { background: var(--accent-hover); }
+    .btn-action:disabled { opacity: 0.5; cursor: default; }
     .btn-blue { background: var(--blue-action); }
+    .btn-warning { background: var(--warning); color: #111; }
 
-    /* Arena & Combat */
     .battle-arena { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); min-height: 200px; border-radius: 8px; padding: 15px; margin-bottom: 12px; border: 1px solid var(--border); }
     .fighter { text-align: center; width: 42%; }
     .health-bar { width: 100%; height: 10px; background: #333; border-radius: 5px; overflow: hidden; margin-top: 5px; }
@@ -58,6 +60,13 @@
 
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index:100; justify-content: center; align-items: center; }
     .modal-content { background: var(--panel-bg); border: 1px solid var(--border); padding: 20px; border-radius: 10px; max-width: 500px; width: 90%; max-height: 85vh; overflow-y: auto; }
+
+    .progression-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 15px; }
+    .stat-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px; }
+    .quest-item { background: rgba(0,0,0,0.18); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-top: 8px; }
+    .quest-item.completed { border-color: var(--accent); }
+    .progress-bar { width: 100%; height: 8px; background: #222; border-radius: 999px; overflow: hidden; margin-top: 8px; }
+    .progress-fill { height: 100%; background: var(--accent); }
   </style>
 </head>
 <body>
@@ -77,6 +86,7 @@
     <button class="nav-btn" onclick="switchTab('teams')">👥 Équipes</button>
     <button class="nav-btn" onclick="switchTab('box')">📦 Boîte & Stats</button>
     <button class="nav-btn" onclick="switchTab('pve')">⚔️ Combats & Raids</button>
+    <button class="nav-btn" onclick="switchTab('progression')">🧭 Progression</button>
     <button class="nav-btn" onclick="switchTab('shop')">🛒 Boutique</button>
   </nav>
 
@@ -146,6 +156,34 @@
     <div id="battle-log" class="log-box" style="margin-top:10px;">Prêt au combat.</div>
   </div>
 
+  <!-- TAB: PROGRESSION -->
+  <div id="tab-progression" class="tab-content">
+    <h2>Progression & Objectifs</h2>
+    <div class="progression-grid">
+      <div class="stat-box">
+        <h3>Zone actuelle</h3>
+        <p id="zone-name">Forêt de Verdure</p>
+      </div>
+      <div class="stat-box">
+        <h3>Exploration</h3>
+        <p id="progression-stats">0 combats gagnés</p>
+      </div>
+      <div class="stat-box">
+        <h3>Récompense quotidienne</h3>
+        <button class="btn-action" onclick="claimDailyReward()">Récupérer</button>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <h3>Objectifs</h3>
+      <div id="quest-list"></div>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <button class="btn-action btn-warning" onclick="resetGame()">Réinitialiser la sauvegarde</button>
+    </div>
+  </div>
+
   <!-- TAB: SHOP -->
   <div id="tab-shop" class="tab-content">
     <h2>Boutique</h2>
@@ -174,11 +212,58 @@
   </div>
 
   <script>
+    const STORAGE_KEY = 'squirtle_check_save_v1';
     let POKEMON_DB = [];
     let state = {
       eggs: 5, coins: 5000, capsules: 5, candies: 10,
-      collection: [], teams: [[], [], []], activeTeamIdx: 0
+      collection: [], teams: [[], [], []], activeTeamIdx: 0,
+      stats: { hatches: 0, battlesWon: 0, levelsRaised: 0 },
+      quests: [],
+      lastDailyReward: 0,
+      zone: 1
     };
+
+    function getDefaultQuests() {
+      return [
+        { id: 'hatch3', title: 'Éclore 3 œufs', goal: 3, progress: 0, reward: { eggs: 1 }, claimed: false },
+        { id: 'battle2', title: 'Gagner 2 combats', goal: 2, progress: 0, reward: { coins: 400 }, claimed: false },
+        { id: 'level10', title: 'Faire atteindre un Pokémon niveau 10', goal: 1, progress: 0, reward: { capsules: 2 }, claimed: false }
+      ];
+    }
+
+    function saveGame() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function loadGame() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        state.quests = getDefaultQuests();
+        return;
+      }
+
+      try {
+        const saved = JSON.parse(raw);
+        state = { ...state, ...saved, stats: { ...state.stats, ...(saved.stats || {}) } };
+        if (!Array.isArray(state.quests) || state.quests.length === 0) state.quests = getDefaultQuests();
+        if (!Array.isArray(state.teams) || state.teams.length !== 3) state.teams = [[], [], []];
+        state.zone = Math.max(1, Math.floor((state.stats.battlesWon || 0) / 3) + 1);
+      } catch (e) {
+        console.error('Erreur de chargement de la sauvegarde', e);
+        state.quests = getDefaultQuests();
+      }
+    }
+
+    function getZoneName() {
+      const zones = [
+        'Forêt de Verdure',
+        'Mine de Sable',
+        'Grottes du Rift',
+        'Pic Volcanique',
+        'Cité Étoilée'
+      ];
+      return zones[Math.min(state.zone - 1, zones.length - 1)];
+    }
 
     async function loadPokemonData() {
       try {
@@ -186,7 +271,7 @@
         POKEMON_DB = await response.json();
         updateUI();
       } catch (e) {
-        console.error("Erreur de chargement JSON", e);
+        console.error('Erreur de chargement JSON', e);
       }
     }
 
@@ -197,24 +282,122 @@
       document.getElementById('coins-count').innerText = state.coins;
       document.getElementById('capsule-count').innerText = state.capsules;
       document.getElementById('candy-count').innerText = state.candies;
+      document.getElementById('active-team-select').value = String(state.activeTeamIdx);
       renderBox();
       renderTeamsView();
+      renderProgression();
+    }
+
+    function renderProgression() {
+      const zoneEl = document.getElementById('zone-name');
+      if (zoneEl) zoneEl.innerText = getZoneName();
+
+      const statsEl = document.getElementById('progression-stats');
+      if (statsEl) statsEl.innerText = `${state.stats.battlesWon} combats gagnés · ${state.stats.hatches} œufs éclos`;
+
+      const questList = document.getElementById('quest-list');
+      if (!questList) return;
+
+      refreshQuestProgress();
+
+      questList.innerHTML = state.quests.map(q => {
+        const percent = Math.min(100, (q.progress / q.goal) * 100);
+        const label = q.claimed ? 'Récupérée' : (q.progress >= q.goal ? 'À réclamer' : 'En cours');
+        return `
+          <div class="quest-item ${q.claimed ? 'completed' : ''}">
+            <strong>${q.title}</strong>
+            <div style="margin-top:6px; font-size:0.8em; color:#d0d7de;">${q.progress}/${q.goal} · ${label}</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${percent}%"></div></div>
+            <div style="margin-top:8px;">
+              <button class="btn-action" onclick="claimQuest('${q.id}')" ${(!q.claimed && q.progress >= q.goal) ? '' : 'disabled'}>
+                Réclamer
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function refreshQuestProgress() {
+      state.quests.forEach(q => {
+        if (q.id === 'hatch3') q.progress = state.stats.hatches;
+        if (q.id === 'battle2') q.progress = state.stats.battlesWon;
+        if (q.id === 'level10') q.progress = state.collection.some(p => p.level >= 10) ? 1 : 0;
+      });
+    }
+
+    function claimQuest(id) {
+      const quest = state.quests.find(q => q.id === id);
+      if (!quest || quest.claimed || quest.progress < quest.goal) return;
+
+      quest.claimed = true;
+      if (quest.reward.eggs) state.eggs += quest.reward.eggs;
+      if (quest.reward.coins) state.coins += quest.reward.coins;
+      if (quest.reward.capsules) state.capsules += quest.reward.capsules;
+      if (quest.reward.candies) state.candies += quest.reward.candies;
+      saveGame();
+      updateUI();
     }
 
     function switchTab(tabId) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-      document.getElementById(`tab-${tabId}`).classList.add('active');
-      event.target.classList.add('active');
+      const targetTab = document.getElementById(`tab-${tabId}`);
+      if (targetTab) targetTab.classList.add('active');
+
+      const tabsMap = {
+        gacha: '🥚 Couvoir',
+        teams: '👥 Équipes',
+        box: '📦 Boîte & Stats',
+        pve: '⚔️ Combats & Raids',
+        progression: '🧭 Progression',
+        shop: '🛒 Boutique'
+      };
+
+      const button = Array.from(document.querySelectorAll('.nav-btn')).find(el => el.textContent.includes(tabsMap[tabId] || ''));
+      if (button) button.classList.add('active');
+    }
+
+    function claimDailyReward() {
+      const today = new Date().toDateString();
+      const last = state.lastDailyReward ? new Date(state.lastDailyReward).toDateString() : null;
+
+      if (last === today) {
+        alert('Récompense déjà récupérée aujourd\'hui.');
+        return;
+      }
+
+      state.lastDailyReward = Date.now();
+      state.eggs += 1;
+      state.coins += 200;
+      saveGame();
+      updateUI();
+      alert('Récompense quotidienne reçue : +1 œuf et +200 Pokédollars !');
+    }
+
+    function resetGame() {
+      if (!confirm('Réinitialiser définitivement la sauvegarde ?')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      state = {
+        eggs: 5, coins: 5000, capsules: 5, candies: 10,
+        collection: [], teams: [[], [], []], activeTeamIdx: 0,
+        stats: { hatches: 0, battlesWon: 0, levelsRaised: 0 },
+        quests: getDefaultQuests(),
+        lastDailyReward: 0,
+        zone: 1
+      };
+      updateUI();
     }
 
     function hatchEgg() {
-      if (state.eggs <= 0 || POKEMON_DB.length === 0) { alert("Indisponible !"); return; }
+      if (state.eggs <= 0 || POKEMON_DB.length === 0) { alert('Indisponible !'); return; }
       state.eggs--;
+      state.stats.hatches += 1;
+      state.zone = Math.max(1, Math.floor((state.stats.battlesWon || 0) / 3) + 1);
       
       const t = POKEMON_DB[Math.floor(Math.random() * POKEMON_DB.length)];
       const isShiny = Math.random() < 0.1;
-      const isHidden = Math.random() < 0.2; // 20% de chance d'avoir le talent caché (HA)
+      const isHidden = Math.random() < 0.2;
       const ivs = { hp: Math.floor(Math.random()*32), atk: Math.floor(Math.random()*32), def: Math.floor(Math.random()*32), spe: Math.floor(Math.random()*32) };
       const evs = { hp: 0, atk: 0, def: 0, spe: 0 };
       const maxHp = 50 + ivs.hp;
@@ -234,13 +417,14 @@
           <p style="font-size:0.75em; color:#58a6ff;">Talent : ${isHidden ? t.hiddenAbility + ' (HA)' : t.ability}</p>
         </div>
       `;
+      saveGame();
       updateUI();
     }
 
     function getAvailableMoves(pokemon) {
       let t = getTemplate(pokemon.templateId);
       let moves = [];
-      if (!t.learnset) return [{name: "Charge", power: 40}];
+      if (!t.learnset) return [{name: 'Charge', power: 40}];
       for (let lvl in t.learnset) {
         if (pokemon.level >= parseInt(lvl)) moves.push(t.learnset[lvl]);
       }
@@ -249,6 +433,7 @@
 
     function renderBox() {
       const grid = document.getElementById('box-grid');
+      if (!grid) return;
       grid.innerHTML = '';
       state.collection.forEach(p => {
         let t = getTemplate(p.templateId);
@@ -265,11 +450,12 @@
       });
     }
 
-    function setActiveTeam(idx) { state.activeTeamIdx = parseInt(idx); renderTeamsView(); }
+    function setActiveTeam(idx) { state.activeTeamIdx = parseInt(idx); renderTeamsView(); saveGame(); }
 
     function renderTeamsView() {
       const activeGrid = document.getElementById('active-team-grid');
       const boxGrid = document.getElementById('team-box-grid');
+      if (!activeGrid || !boxGrid) return;
       activeGrid.innerHTML = ''; boxGrid.innerHTML = '';
 
       state.teams[state.activeTeamIdx].forEach(uid => {
@@ -296,6 +482,7 @@
       if (state.teams[state.activeTeamIdx].length >= 6) return;
       state.teams[state.activeTeamIdx].push(uid);
       renderTeamsView();
+      saveGame();
     }
 
     function removeFromTeam(uid) {
@@ -303,10 +490,12 @@
       let idx = team.indexOf(uid);
       if (idx > -1) team.splice(idx, 1);
       renderTeamsView();
+      saveGame();
     }
 
     function openPokemonModal(uid) {
       let p = state.collection.find(item => item.uid === uid);
+      if (!p) return;
       let t = getTemplate(p.templateId);
       let unlockedMoves = getAvailableMoves(p);
 
@@ -334,51 +523,52 @@
     function closeModal(id) { document.getElementById(id).style.display = 'none'; updateUI(); }
 
     function maxIV(uid, stat) {
-      if (state.capsules <= 0) { alert("Plus de capsules !"); return; }
+      if (state.capsules <= 0) { alert('Plus de capsules !'); return; }
       let p = state.collection.find(item => item.uid === uid);
       p.ivs[stat] = 31; state.capsules--;
+      saveGame();
       openPokemonModal(uid); updateUI();
     }
 
     function addEV(uid, stat) {
       let p = state.collection.find(item => item.uid === uid);
-      if (p.evs[stat] < 252) { p.evs[stat] += 10; openPokemonModal(uid); }
+      if (p.evs[stat] < 252) { p.evs[stat] += 10; saveGame(); openPokemonModal(uid); }
     }
 
     function feedCandy(uid) {
-      if (state.candies <= 0) { alert("Plus de bonbons !"); return; }
+      if (state.candies <= 0) { alert('Plus de bonbons !'); return; }
       let p = state.collection.find(item => item.uid === uid);
-      state.candies--; p.level++;
+      state.candies--; p.level++; state.stats.levelsRaised += 1;
       p.maxHp += 12; p.currentHp = p.maxHp;
       let t = getTemplate(p.templateId);
       if (t.evoId && p.level >= t.evoLevel) p.templateId = t.evoId;
+      saveGame();
       openPokemonModal(uid); updateUI();
     }
 
     function buyItem(type, price) {
-      if (state.coins < price) { alert("Fonds insuffisants !"); return; }
+      if (state.coins < price) { alert('Fonds insuffisants !'); return; }
       state.coins -= price;
       if (type === 'egg') state.eggs++;
       if (type === 'capsule') state.capsules++;
       if (type === 'candy') state.candies += 3;
+      saveGame();
       updateUI();
     }
 
-    // SYSTÈME DE COMBAT AVEC RESTAURATION AUTOMATIQUE DES PV
     let activeBattle = null;
 
     function startBattle(mode) {
       let currentTeamUids = state.teams[state.activeTeamIdx];
       let teamPokemons = currentTeamUids.map(uid => state.collection.find(p => p.uid === uid)).filter(Boolean);
       
-      if (teamPokemons.length === 0) { alert("Équipe active vide !"); return; }
+      if (teamPokemons.length === 0) { alert('Équipe active vide !'); return; }
 
-      // Restauration complète des PV de l'équipe au début de chaque combat
       teamPokemons.forEach(p => { p.currentHp = p.maxHp; });
 
       let enemy = mode === 'raid'
-        ? { name: "Gigamax Rayquaza", hp: 600, maxHp: 600, shield: 250, maxShield: 250, sprite: POKEMON_DB.find(p=>p.id===384)?.shinySprite || "", atk: 35 }
-        : { name: "Dresseur Sauvage", hp: 150, maxHp: 150, shield: 0, sprite: POKEMON_DB.find(p=>p.id===4)?.sprite || "", atk: 15 };
+        ? { name: 'Gigamax Rayquaza', hp: 600, maxHp: 600, shield: 250, maxShield: 250, sprite: POKEMON_DB.find(p=>p.id===384)?.shinySprite || '', atk: 35 }
+        : { name: 'Dresseur Sauvage', hp: 150, maxHp: 150, shield: 0, sprite: POKEMON_DB.find(p=>p.id===4)?.sprite || '', atk: 15 };
 
       activeBattle = { team: teamPokemons, enemy, activeIndex: 0 };
       updateCombatUI();
@@ -423,6 +613,9 @@
       if (activeBattle.enemy.hp <= 0) {
         logBattle(`🏆 Victoire ! +500 🪙`);
         state.coins += 500;
+        state.stats.battlesWon += 1;
+        state.zone = Math.max(1, Math.floor((state.stats.battlesWon || 0) / 3) + 1);
+        saveGame();
         document.getElementById('combat-actions').style.display = 'none';
         activeBattle = null;
         updateUI();
@@ -481,6 +674,7 @@
     function updateBattleHp() {
       if (!activeBattle) return;
       let activePoke = activeBattle.team[activeBattle.activeIndex];
+      if (!activePoke) return;
       let playerHpPercent = (activePoke.currentHp / activePoke.maxHp) * 100;
       let enemyHpPercent = (activeBattle.enemy.hp / activeBattle.enemy.maxHp) * 100;
 
@@ -497,7 +691,9 @@
       log.scrollTop = log.scrollHeight;
     }
 
+    loadGame();
     loadPokemonData();
+    updateUI();
   </script>
 </body>
 </html>
