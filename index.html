@@ -272,20 +272,46 @@
         .join(' ');
     }
 
-    function buildFallbackPokemon(pokemon, index = 0) {
-      const moves = [
-        { name: 'Charge', power: 40 },
-        { name: 'Morsure', power: 60 },
-        { name: 'Tranch Herbe', power: 70 },
-        { name: 'Flammèche', power: 60 },
-        { name: 'Pistolet à O', power: 65 },
-        { name: 'Coup de Pied', power: 80 }
-      ];
+    async function fetchMovePower(moveRef) {
+      try {
+        const moveResponse = await fetch(moveRef.move.url);
+        const move = await moveResponse.json();
+        return {
+          name: capitalizeName(move.name),
+          power: move.power || 40
+        };
+      } catch (e) {
+        return {
+          name: capitalizeName(moveRef.move.name),
+          power: 40
+        };
+      }
+    }
 
-      const gen = Math.min(9, Math.floor((pokemon.id - 1) / 151) + 1);
+    function buildFallbackPokemon(pokemon, index = 0) {
       const type1 = pokemon.types?.[0]?.type?.name || 'Normal';
       const type2 = pokemon.types?.[1]?.type?.name || null;
       const abilities = pokemon.abilities || [];
+      const gen = Math.min(9, Math.floor((pokemon.id - 1) / 151) + 1);
+      const learnset = {};
+      const defaultMoves = [
+        { name: 'Charge', power: 40 },
+        { name: 'Morsure', power: 60 },
+        { name: 'Fouet Lianes', power: 45 },
+        { name: 'Flammèche', power: 40 },
+        { name: 'Pistolet à O', power: 50 },
+        { name: 'Fatal-Foudre', power: 75 }
+      ];
+
+      (pokemon.moves || []).slice(0, 6).forEach((moveRef, idx) => {
+        learnset[String(4 + idx * 5)] = { name: capitalizeName(moveRef.move.name), power: 40 + idx * 8 };
+      });
+
+      if (Object.keys(learnset).length === 0) {
+        defaultMoves.forEach((move, idx) => {
+          learnset[String(1 + idx * 6)] = move;
+        });
+      }
 
       return {
         id: pokemon.id,
@@ -309,12 +335,7 @@
         generation: gen,
         sprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`,
         shinySprite: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${pokemon.id}.png`,
-        learnset: {
-          1: moves[index % moves.length],
-          6: moves[(index + 1) % moves.length],
-          18: moves[(index + 2) % moves.length],
-          30: moves[(index + 3) % moves.length]
-        }
+        learnset
       };
     }
 
@@ -341,7 +362,16 @@
         const data = await Promise.all(results.map(async (entry, index) => {
           const detailResponse = await fetch(entry.url);
           const detail = await detailResponse.json();
-          return buildFallbackPokemon(detail, index);
+
+          const moveDetails = await Promise.all((detail.moves || []).slice(0, 6).map(fetchMovePower));
+          const learnset = {};
+          moveDetails.forEach((move, idx) => {
+            learnset[String(4 + idx * 5)] = move;
+          });
+
+          const pokemon = buildFallbackPokemon(detail, index);
+          pokemon.learnset = Object.keys(learnset).length ? learnset : pokemon.learnset;
+          return pokemon;
         }));
 
         POKEMON_DB = data;
