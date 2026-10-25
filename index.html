@@ -33,8 +33,8 @@
     .tab-content { display: none; width: 100%; max-width: 1050px; background: var(--panel-bg); border: 1px solid var(--border); border-radius: 10px; padding: 15px; }
     .tab-content.active { display: block; }
 
-    .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top: 12px; }
-    .poke-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center; position: relative; font-size: 0.85em; }
+    .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-top: 12px; }
+    .poke-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center; position: relative; font-size: 0.85em; cursor: pointer; }
     .poke-card.shiny { border-color: var(--shiny-gold); box-shadow: 0 0 10px rgba(241, 224, 90, 0.3); }
     .poke-card img { width: 80px; height: 80px; object-fit: contain; }
     .badge-shiny { position: absolute; top: 5px; right: 5px; background: var(--shiny-gold); color: #000; font-size: 0.65em; font-weight: bold; padding: 2px 5px; border-radius: 3px; }
@@ -50,7 +50,7 @@
     .shield-bar { width: 100%; height: 6px; background: #222; border-radius: 3px; overflow: hidden; margin-top: 3px; }
     .shield-fill { height: 100%; background: #00d2d3; width: 100%; transition: width 0.3s; }
 
-    .log-box { height: 110px; background: rgba(0,0,0,0.6); border-radius: 6px; padding: 8px; overflow-y: auto; font-family: monospace; font-size: 0.8em; border: 1px solid var(--border); }
+    .log-box { height: 130px; background: rgba(0,0,0,0.6); border-radius: 6px; padding: 8px; overflow-y: auto; font-family: monospace; font-size: 0.8em; border: 1px solid var(--border); }
     
     /* Modal / Configuration */
     .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.8); z-index:100; justify-content: center; align-items: center; }
@@ -63,8 +63,8 @@
     <h1>⚡ Pokémon Tactical RPG ⚡</h1>
     <div class="currencies">
       <div class="currency-item">🥚 Œufs: <span id="egg-count">5</span></div>
-      <div class="currency-item">🪙 Pokédollars: <span id="coins-count">2000</span></div>
-      <div class="currency-item">💊 Capsules IV: <span id="capsule-count">3</span></div>
+      <div class="currency-item">🪙 Pokédollars: <span id="coins-count">5000</span></div>
+      <div class="currency-item">💊 Capsules IV: <span id="capsule-count">5</span></div>
       <div class="currency-item">🍬 Bonbons EXP: <span id="candy-count">10</span></div>
     </div>
   </header>
@@ -92,7 +92,7 @@
   <div id="tab-teams" class="tab-content">
     <h2>Gestion des Équipes (6 Pokémon max par équipe)</h2>
     <div style="margin-bottom: 15px;">
-      <label>Équipe active : </label>
+      <label>Sélectionner l'équipe : </label>
       <select id="active-team-select" onchange="setActiveTeam(this.value)" style="padding:6px; background:var(--card-bg); color:var(--text); border:1px solid var(--border); border-radius:4px;">
         <option value="0">Équipe 1</option>
         <option value="1">Équipe 2</option>
@@ -100,14 +100,14 @@
       </select>
     </div>
     <h3>Membres de l'équipe active :</h3>
-    <div id="active-team-grid" class="grid-container" style="margin-bottom: 20px;"></div>
-    <h3>Ajouter depuis la Boîte :</h3>
+    <div id="active-team-grid" class="grid-container" style="margin-bottom: 20px; min-height: 110px; border: 1px solid var(--border); padding: 10px; border-radius: 6px;"></div>
+    <h3>Disponibles dans la Boîte :</h3>
     <div id="team-box-grid" class="grid-container"></div>
   </div>
 
   <!-- TAB: BOX -->
   <div id="tab-box" class="tab-content">
-    <h2>Boîte Pokémon & Optimisation (IV, EV, Spells, Évolutions)</h2>
+    <h2>Boîte Pokémon & Optimisation (Cliquez sur un Pokémon pour le configurer)</h2>
     <div id="box-grid" class="grid-container"></div>
   </div>
 
@@ -116,7 +116,7 @@
     <h2>Zone de Combat & Raids Dimensionnels</h2>
     <div class="battle-arena">
       <div class="fighter">
-        <div id="player-team-name">Équipe Active</div>
+        <div id="player-team-name">Équipe Active (0 Pokémon)</div>
         <img id="player-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" />
         <div class="health-bar"><div id="player-hp" class="health-fill"></div></div>
       </div>
@@ -124,7 +124,7 @@
       <div class="fighter">
         <div id="enemy-name">Adversaire</div>
         <img id="enemy-img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/ultra-ball.png" />
-        <div id="shield-box" style="display:none;">
+        <div id="shield-box" style="display:none; margin-top:5px;">
           <div class="shield-bar"><div id="enemy-shield" class="shield-fill"></div></div>
         </div>
         <div class="health-bar"><div id="enemy-hp" class="health-fill"></div></div>
@@ -134,10 +134,10 @@
     <div style="text-align: center; margin-bottom: 10px;">
       <button class="btn-action" onclick="startBattle('wild')">🌿 Combat PvE</button>
       <button class="btn-action" style="background:var(--purple-raid);" onclick="startBattle('raid')">👹 Raid Dynamax</button>
-      <button id="btn-attack" class="btn-action" style="display:none; background:#2ea043;" onclick="executeTeamTurn()">⚔️ Ordre d'Attaque Équipe</button>
+      <button id="btn-attack" class="btn-action" style="display:none; background:#2ea043;" onclick="executeTeamTurn()">⚔️ Attaquer avec l'Équipe</button>
     </div>
 
-    <div id="battle-log" class="log-box" style="margin-top:10px;">Prêt au combat avec toute l'équipe...</div>
+    <div id="battle-log" class="log-box" style="margin-top:10px;">Prêt au combat. Sélectionnez une zone de combat ci-dessus.</div>
   </div>
 
   <!-- TAB: SHOP -->
@@ -152,8 +152,8 @@
       <div class="poke-card">
         <h4>💊 Capsule d'Argent</h4>
         <p>Passe un IV à 31</p>
-        <p>800 🪙</p>
-        <button class="btn-action" onclick="buyItem('capsule', 800)">Acheter</button>
+        <p>500 🪙</p>
+        <button class="btn-action" onclick="buyItem('capsule', 500)">Acheter</button>
       </div>
       <div class="poke-card">
         <h4>🍬 Bonbon EXP L</h4>
@@ -188,11 +188,11 @@
 
     let state = {
       eggs: 5,
-      coins: 2000,
-      capsules: 3,
+      coins: 5000,
+      capsules: 5,
       candies: 10,
       collection: [],
-      teams: [[], [], []], // 3 équipes différentes
+      teams: [[], [], []],
       activeTeamIdx: 0
     };
 
@@ -220,7 +220,6 @@
       const t = baseTemplates[Math.floor(Math.random() * baseTemplates.length)];
       const isShiny = Math.random() < 0.1;
       const ivs = { hp: randIV(), atk: randIV(), def: randIV(), spe: randIV() };
-      const evs = { hp: 0, atk: 0, def: 0, spe: 0 };
 
       const pokemon = {
         templateId: t.id,
@@ -228,9 +227,8 @@
         exp: 0,
         isShiny,
         ivs,
-        evs,
         activeMove: t.moves[0].name,
-        uid: Date.now() + Math.random()
+        uid: 'p_' + Date.now() + '_' + Math.floor(Math.random() * 10000)
       };
 
       state.collection.push(pokemon);
@@ -251,6 +249,10 @@
     function renderBox() {
       const grid = document.getElementById('box-grid');
       grid.innerHTML = '';
+      if (state.collection.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; opacity:0.6;">Votre boîte est vide. Faites éclore des œufs dans le couvoir !</p>';
+        return;
+      }
       state.collection.forEach(p => {
         let t = getTemplate(p.templateId);
         const card = document.createElement('div');
@@ -271,7 +273,6 @@
       });
     }
 
-    // GESTION DES ÉQUIPES MULTIPLES
     function setActiveTeam(idx) {
       state.activeTeamIdx = parseInt(idx);
       renderTeamsView();
@@ -285,22 +286,30 @@
 
       let currentTeam = state.teams[state.activeTeamIdx];
 
-      // Afficher l'équipe active
-      currentTeam.forEach(uid => {
-        let p = state.collection.find(item => item.uid === uid);
-        if (!p) return;
-        let t = getTemplate(p.templateId);
-        const card = document.createElement('div');
-        card.className = `poke-card ${p.isShiny ? 'shiny' : ''}`;
-        card.innerHTML = `
-          <img src="${p.isShiny ? t.shinySprite : t.sprite}" />
-          <h4>${t.name}</h4>
-          <button class="btn-action" style="font-size:0.7em;" onclick="removeFromTeam('${uid}')">Retirer</button>
-        `;
-        activeGrid.appendChild(card);
-      });
+      if (currentTeam.length === 0) {
+        activeGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; opacity:0.6;">Aucun Pokémon dans cette équipe. Ajoutez-en depuis votre boîte ci-dessous.</p>';
+      } else {
+        currentTeam.forEach(uid => {
+          let p = state.collection.find(item => item.uid === uid);
+          if (!p) return;
+          let t = getTemplate(p.templateId);
+          const card = document.createElement('div');
+          card.className = `poke-card ${p.isShiny ? 'shiny' : ''}`;
+          card.innerHTML = `
+            <img src="${p.isShiny ? t.shinySprite : t.sprite}" />
+            <h4>${t.name}</h4>
+            <p style="font-size:0.75em;">Niv. ${p.level}</p>
+            <button class="btn-action" style="font-size:0.7em;" onclick="removeFromTeam('${uid}')">Retirer</button>
+          `;
+          activeGrid.appendChild(card);
+        });
+      }
 
-      // Afficher les Pokémon disponibles dans la boîte pour les ajouter
+      if (state.collection.length === 0) {
+        boxGrid.innerHTML = '<p style="grid-column: 1/-1; text-align:center; opacity:0.6;">Boîte vide.</p>';
+        return;
+      }
+
       state.collection.forEach(p => {
         let inAnyTeam = state.teams.some(team => team.includes(p.uid));
         if (inAnyTeam) return;
@@ -310,7 +319,7 @@
         card.innerHTML = `
           <img src="${p.isShiny ? t.shinySprite : t.sprite}" />
           <h4>${t.name} (Niv.${p.level})</h4>
-          <button class="btn-action" style="font-size:0.7em;" onclick="addToTeam('${p.uid}')">Ajouter à l'équipe</button>
+          <button class="btn-action" style="font-size:0.7em;" onclick="addToTeam('${p.uid}')">Ajouter</button>
         `;
         boxGrid.appendChild(card);
       });
@@ -329,7 +338,6 @@
       renderTeamsView();
     }
 
-    // MODAL OPTIMISATION (IV, EV, SPELLS, EXP, EVOLUTION)
     function openPokemonModal(uid) {
       let p = state.collection.find(item => item.uid === uid);
       let t = getTemplate(p.templateId);
@@ -360,6 +368,7 @@
     function maxIV(uid, stat) {
       if (state.capsules <= 0) { alert("Plus de Capsules d'Argent !"); return; }
       let p = state.collection.find(item => item.uid === uid);
+      if (!p) return;
       p.ivs[stat] = 31;
       state.capsules--;
       openPokemonModal(uid);
@@ -369,13 +378,13 @@
     function feedCandy(uid) {
       if (state.candies <= 0) { alert("Plus de bonbons EXP !"); return; }
       let p = state.collection.find(item => item.uid === uid);
+      if (!p) return;
       state.candies--;
       p.level++;
       
-      // Vérification Évolution logique
-      let t = getTemplate(p.templateId);
-      if (t.evoId && p.level >= t.evoLevel) {
-        p.templateId = t.evoId;
+      let template = getTemplate(p.templateId);
+      if (template.evoId && p.level >= template.evoLevel) {
+        p.templateId = template.evoId;
         alert(`Félicitations ! Votre Pokémon a évolué en ${getTemplate(p.templateId).name} !`);
       }
 
@@ -385,6 +394,7 @@
 
     function setMove(uid, moveName) {
       let p = state.collection.find(item => item.uid === uid);
+      if (!p) return;
       p.activeMove = moveName;
       openPokemonModal(uid);
     }
@@ -398,22 +408,26 @@
       updateUI();
     }
 
-    // COMBAT AVEC TOUTE L'ÉQUIPE ACTIVE
     let activeBattle = null;
 
     function startBattle(mode) {
       let currentTeamUids = state.teams[state.activeTeamIdx];
       if (currentTeamUids.length === 0) { alert("Votre équipe active est vide ! Ajoutez des Pokémon dans l'onglet Équipes."); return; }
 
-      let teamPokemons = currentTeamUids.map(uid => state.collection.find(p => p.uid === uid));
-      
+      let teamPokemons = currentTeamUids.map(uid => state.collection.find(p => p.uid === uid)).filter(Boolean);
+      if (teamPokemons.length === 0) { alert("Erreur d'équipe active."); return; }
+
       let enemy = mode === 'raid'
         ? { name: "Gigamax Rayquaza", hp: 800, maxHp: 800, shield: 300, maxShield: 300, sprite: POKEMON_DB[2].shinySprite, atk: 35, isRaid: true }
         : { name: "Dresseur Sauvage", hp: 150, maxHp: 150, shield: 0, sprite: POKEMON_DB[3].sprite, atk: 15, isRaid: false };
 
       activeBattle = { team: teamPokemons, enemy, activeIndex: 0 };
 
+      let leadPoke = teamPokemons[0];
+      let leadT = getTemplate(leadPoke.templateId);
+
       document.getElementById('player-team-name').innerText = `Équipe Active (${teamPokemons.length} Pokémon)`;
+      document.getElementById('player-img').src = leadPoke.isShiny ? leadT.shinySprite : leadT.sprite;
       document.getElementById('enemy-name').innerText = enemy.name;
       document.getElementById('enemy-img').src = enemy.sprite;
       document.getElementById('shield-box').style.display = enemy.shield > 0 ? 'block' : 'none';
@@ -430,7 +444,9 @@
       let t = getTemplate(currentPoke.templateId);
       let moveObj = t.moves.find(m => m.name === currentPoke.activeMove) || t.moves[0];
 
-      // Calcul dégâts basé sur ATK + IV ATK + Level
+      // Afficher le sprite du Pokémon actif
+      document.getElementById('player-img').src = currentPoke.isShiny ? t.shinySprite : t.sprite;
+
       let dmg = Math.floor((currentPoke.level * 2 + currentPoke.ivs.atk) * (moveObj.power / 20));
 
       if (activeBattle.enemy.shield > 0) {
@@ -439,14 +455,14 @@
           activeBattle.enemy.hp += activeBattle.enemy.shield;
           activeBattle.enemy.shield = 0;
         }
-        logBattle(`${t.name} utilise ${moveObj.activeMove || moveObj.name} sur le bouclier ! (${dmg} dégâts)`);
+        logBattle(`${t.name} utilise ${moveObj.name} sur le bouclier ! (${dmg} dégâts)`);
       } else {
         activeBattle.enemy.hp = Math.max(0, activeBattle.enemy.hp - dmg);
-        logBattle(`${t.name} utilise ${moveObj.activeMove || moveObj.name} ! ${dmg} dégâts infligés.`);
+        logBattle(`${t.name} utilise ${moveObj.name} ! ${dmg} dégâts infligés.`);
       }
 
       if (activeBattle.enemy.hp <= 0) {
-        logBattle(`🏆 Victoire éclatante ! +600 🪙 et gain d'EXP pour l'équipe !`);
+        logBattle(`🏆 Victoire éclatante ! +600 🪙 et +50 EXP pour l'équipe !`);
         state.coins += 600;
         activeBattle.team.forEach(p => {
           p.exp += 50;
@@ -456,6 +472,7 @@
             let template = getTemplate(p.templateId);
             if (template.evoId && p.level >= template.evoLevel) {
               p.templateId = template.evoId;
+              logBattle(`✨ ${template.name} a évolué !`);
             }
           }
         });
@@ -464,13 +481,12 @@
         return;
       }
 
-      // Riposte de l'ennemi sur le Pokémon actif, puis rotation vers le suivant
       let enemyDmg = activeBattle.enemy.atk;
-      logBattle(`${activeBattle.enemy.name} riposte et inflige ${enemyDmg} dégâts à ${t.name}.`);
+      logBattle(`${activeBattle.enemy.name} riposte et inflige ${enemyDmg} dégâts.`);
 
-      // Passer au Pokémon suivant de l'équipe pour le tour d'après
       activeBattle.activeIndex = (activeBattle.activeIndex + 1) % activeBattle.team.length;
-      logBattle(`-> Envoi du Pokémon suivant : ${getTemplate(activeBattle.team[activeBattle.activeIndex].templateId).name}`);
+      let nextPoke = activeBattle.team[activeBattle.activeIndex];
+      logBattle(`-> Changement de Pokémon actif : ${getTemplate(nextPoke.templateId).name}`);
 
       updateBattleHp();
     }
